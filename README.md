@@ -8,10 +8,9 @@ steam-bigdata-pipeline/
 │   └── kaggle_cache/       # Mapeado para o container Jupyter
 │
 ├── notebooks/              # Seus scripts de análise e ETL
-│   └── SteamData.ipynb  # O código que você forneceu vai aqui
+│   └── Trabalho.ipynb  # O código que você forneceu vai aqui
 │
 ├── docker-compose.yml      # A orquestração de toda a infraestrutura
-├── requirements.txt        # Dependências do Python
 ├── README.md               # A documentação principal do projeto
 └── .gitignore              # Para não subir arquivos pesados (CSV)
 ```
