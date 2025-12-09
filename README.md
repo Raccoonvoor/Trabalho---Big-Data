@@ -303,17 +303,23 @@ MongoDB: Atua como nosso Data Warehouse NoSQL, armazenando os dados estruturados
 
 Visualização (Metabase): Conectado ao MongoDB para criação de Dashboards e exploração de dados.
 
+A estrutura da aplicação consiste em alguns serviços disponibilizados em containers. Para conectar-mos o serviço de dados do mongodb ao metabase precisamos encontrar o endereço de ip que o serviço do mongodb expõe na nossa rede, para isso vamos fazer o seguinte passa a passo:
+
 Utilizei o comando: **docker ps** para poder listar todos os containers na minha aplicação.
+
 <img width="1312" height="111" alt="image" src="https://github.com/user-attachments/assets/bd53fbe4-3162-4336-99d7-7ab523f62fa3" />
 
-Utilizei o comando: **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME_OR_ID>**
-Para obter **<CONTAINER_NAME_OR_ID>**. Para no fim utilizar **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'** mongo_service para encontrar o endereço ip
+Notamos um serviço com o nome mongo_service, então vamos indentificar o endereço de ip que esse container está expondo, para isso utilizei o comando: **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME_OR_ID>**
+
+Para obter **<CONTAINER_NAME_OR_ID>**. Para no fim utilizar **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mongo_service** para encontrar o endereço ip
+
 <img width="971" height="35" alt="image" src="https://github.com/user-attachments/assets/6fea60d7-325e-4c79-bd3d-750358cccb31" />
 
 Como fiz no metabase:
 
 <img width="1918" height="967" alt="image" src="https://github.com/user-attachments/assets/d4206c50-0a72-4e38-9966-ee19e6377c96" />
 
+Com a conexão estabelecida podemos analisar os dados sicronizados de multiplas formas, como mostra as imagens abaixo:
 
 
 
