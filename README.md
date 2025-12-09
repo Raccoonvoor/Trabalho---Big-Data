@@ -63,8 +63,9 @@ Conexão: Ele se conecta ao MongoDB usando o nome do serviço mongo (conforme de
 **Configuração e Conexão (Código Essencial)**
 
 Como a aplicação se conecta à infraestrutura Docker e configura o ambiente para lidar com arquivos grandes:
+
+**1. IMPORTAÇÕES E CONFIGURAÇÃO (Executar Primeiro)**
 ```
-1. IMPORTAÇÕES E CONFIGURAÇÃO (Executar Primeiro)
 import os
 import pandas as pd
 import kagglehub
@@ -97,8 +98,6 @@ print(f"   -> Destino MongoDB: {MONGO_URI.split('@')[1]}") # Mostra apenas o hos
 **2. Função de Ingestão Otimizada (Chunking)**
 
 A função abaixo é a chave para a eficiência, pois lê os arquivos CSV em pedaços de 10.000 linhas (chunk_size), prevenindo a sobrecarga da memória do contêiner Jupyter:
-
-2. FUNÇÃO DE INGESTÃO (CARGA EM LOTES)
 ```
 def ingest_file_to_mongo(file_path, collection_name):
     """Lê CSV em pedaços e envia para o Mongo para economizar RAM."""
@@ -303,4 +302,18 @@ Ingestão & Processamento (Jupyter): Scripts Python baixam dados do Kaggle, real
 MongoDB: Atua como nosso Data Warehouse NoSQL, armazenando os dados estruturados de Usuários, Jogos e Recomendações.
 
 Visualização (Metabase): Conectado ao MongoDB para criação de Dashboards e exploração de dados.
+
+Utilizei o comando: **docker ps** para poder listar todos os containers na minha aplicação.
+<img width="1312" height="111" alt="image" src="https://github.com/user-attachments/assets/bd53fbe4-3162-4336-99d7-7ab523f62fa3" />
+
+Utilizei o comando: **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME_OR_ID>**
+Para obter **<CONTAINER_NAME_OR_ID>**. Para no fim utilizar **docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'** mongo_service para encontrar o endereço ip
+<img width="971" height="35" alt="image" src="https://github.com/user-attachments/assets/6fea60d7-325e-4c79-bd3d-750358cccb31" />
+
+Como fiz no metabase:
+
+<img width="1918" height="967" alt="image" src="https://github.com/user-attachments/assets/d4206c50-0a72-4e38-9966-ee19e6377c96" />
+
+
+
 
