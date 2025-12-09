@@ -1,28 +1,10 @@
-# Trabalho Big Data  
+# Trabalho Big Data 
 
-**1. Estrutura de Pastas do Repositório**
-```
-steam-bigdata-pipeline/
-│
-├── data/                   # (Ignorado pelo Git) Onde os dados brutos ficam
-│   └── kaggle_cache/       # Mapeado para o container Jupyter
-│
-├── notebooks/              # Seus scripts de análise e ETL
-│   └── Trabalho.ipynb  # O código que você forneceu vai aqui
-│
-├── docker-compose.yml      # A orquestração de toda a infraestrutura
-├── README.md               # A documentação principal do projeto
-└── .gitignore              # Para não subir arquivos pesados (CSV)
-```
-**2. O Arquivo docker-compose.yml (A Infraestrutura)**
+**O Arquivo docker-compose.yml (A Infraestrutura)**
 
-Este é o coração do projeto. Ele sobe o Jupyter, o Mongo, o MinIO e o Metabase, conectando todos na mesma rede.
-Crie um arquivo chamado docker-compose.yml na raiz:
+Este é o coração do projeto. Ele sobe o Jupyter, o Mongo e o Metabase, conectando todos na mesma rede.
 
-version: '3.3'
-
-services:
-**# 1. JUPYTER LAB (Onde roda o código Python)**
+**1. JUPYTER LAB (Onde roda o código Python)**
 
 **docker-compose.yml do Jupyter (ETL e Processamento).**
 ```
@@ -63,7 +45,7 @@ Conexão: Ele se conecta ao MongoDB usando o nome do serviço mongo (conforme de
 
 Como a aplicação se conecta à infraestrutura Docker e configura o ambiente para lidar com arquivos grandes:
 
-**1. IMPORTAÇÕES E CONFIGURAÇÃO (Executar Primeiro)**
+**IMPORTAÇÕES E CONFIGURAÇÃO (Executar Primeiro)**
 ```
 import os
 import pandas as pd
@@ -94,7 +76,7 @@ print(f"⚙ Configuração:")
 print(f"   -> Cache Temporário: {CACHE_DIR}")
 print(f"   -> Destino MongoDB: {MONGO_URI.split('@')[1]}") # Mostra apenas o host para confirmar
 ```
-**2. Função de Ingestão Otimizada (Chunking)**
+**Função de Ingestão Otimizada (Chunking)**
 
 A função abaixo é a chave para a eficiência, pois lê os arquivos CSV em pedaços de 10.000 linhas (chunk_size), prevenindo a sobrecarga da memória do contêiner Jupyter:
 ```
