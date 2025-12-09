@@ -1,20 +1,20 @@
 # Trabalho Big Data  
 
 **1. Estrutura de Pastas do Repositório**
-
+```
 steam-bigdata-pipeline/
 │
 ├── data/                   # (Ignorado pelo Git) Onde os dados brutos ficam
 │   └── kaggle_cache/       # Mapeado para o container Jupyter
 │
 ├── notebooks/              # Seus scripts de análise e ETL
-│   └── etl_pipeline.ipynb  # O código que você forneceu vai aqui
+│   └── SteamData.ipynb  # O código que você forneceu vai aqui
 │
 ├── docker-compose.yml      # A orquestração de toda a infraestrutura
 ├── requirements.txt        # Dependências do Python
 ├── README.md               # A documentação principal do projeto
 └── .gitignore              # Para não subir arquivos pesados (CSV)
-
+```
 **2. O Arquivo docker-compose.yml (A Infraestrutura)**
 
 Este é o coração do projeto. Ele sobe o Jupyter, o Mongo, o MinIO e o Metabase, conectando todos na mesma rede.
@@ -26,7 +26,7 @@ services:
 **# 1. JUPYTER LAB (Onde roda o código Python)**
 
 **docker-compose.yml do Jupyter (ETL e Processamento).**
-
+```
 version: '3.3'
 
 services:
@@ -53,13 +53,13 @@ volumes: # Declaração dos volumes, embora o mapeamento esteja usando caminhos 
   notebooks:
   data:
   config:
-
+```
 Função: Execução do seu pipeline de ingestão e processamento.
 
 Conexão: Ele se conecta ao MongoDB usando o nome do serviço mongo (conforme definido no arquivo do MongoDB) através da rede mybridge.
 
  **2. MONGODB (Banco NoSQL)**
- 
+ ```
 version: '3.3'
 
 services:
@@ -100,13 +100,13 @@ networks:
 volumes:
   dbdata: # O volume nomeado para persistência do Mongo.
   db-seed:
-
+```
 Função: Armazenamento e fornecimento dos dados.
 
 Conexão: Expõe o nome de serviço mongo_service e o host mongo (no Mongo Express) para os outros containers.
 
 **3. METABASE (Visualização e BI)**
-
+```
 version: '3.3'
 
 services:
@@ -129,7 +129,7 @@ networks:
   mybridge: # O Metabase precisa dessa rede para se conectar ao MongoDB.
     external:
       name: mybridge
-      
+```
 Função: Catálogo e exploração dos dados modelados.
 
 Conexão: Você configurará o Metabase manualmente (após iniciar) para usar o host mongo (ou mongo_service, dependendo de como você o nomeou) na porta 27017 dentro da rede mybridge.
