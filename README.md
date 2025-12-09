@@ -289,6 +289,8 @@ Conexão: Você configurará o Metabase manualmente (após iniciar) para usar o 
 
   **Steam Recommendations Big Data Pipeline:**
   
+Link onde obtive meu dataset: https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam/discussion?sort=hotness
+
 O projeto implementa um pipeline de Engenharia de Dados ponta-a-ponta para processar, armazenar e visualizar dados de recomendações de jogos da Steam. O objetivo é ingerir grandes volumes de dados brutos e transformá-los em insights visuais.
 
 **Arquitetura do Projeto:**
@@ -321,5 +323,20 @@ Como fiz no metabase:
 
 Com a conexão estabelecida podemos analisar os dados sicronizados de multiplas formas, como mostra as imagens abaixo:
 
+Um resultado interessante a quantidade de reviews por rating com a média de avalição positivas de cada uma delas, esse resultado é condizente com que esperamos.
+
+<img width="1914" height="962" alt="image" src="https://github.com/user-attachments/assets/1e652c4f-23a7-449c-930f-dbd2ac43dec4" />
+
+Outra analise interessante é a média de preço dos games por ano de lançamento. Para essa análise extraimos o componente ANO da coluna Date Release através da fórmula no metabase indicado na imagem abaixo.
+
+<img width="1914" height="966" alt="image" src="https://github.com/user-attachments/assets/72697253-8cb6-4932-9a64-b99061a07913" />
+
+<img width="1916" height="966" alt="image" src="https://github.com/user-attachments/assets/5c01581c-1592-45ca-bb94-6fd6d86c5106" />
+
+Infelizmente o preço dos jogos está subindo.
+
+A maior quantidade reviews feitas por usuários por ano de lançamento está acontecendo entre 2015 e 2020, isso pode indicar os usuários demoram alguns anos para deixarem reviews, mas ainda faltam dados para ter uma conclusão mais robusta
+
+<img width="1916" height="953" alt="image" src="https://github.com/user-attachments/assets/5dfe0f78-62c0-4d10-873f-0170261a4723" />
 
 
