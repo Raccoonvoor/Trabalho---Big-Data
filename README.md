@@ -58,7 +58,9 @@ Função: Execução do seu pipeline de ingestão e processamento.
 
 Conexão: Ele se conecta ao MongoDB usando o nome do serviço mongo (conforme definido no arquivo do MongoDB) através da rede mybridge.
 
-**1. Configuração e Conexão (Código Essencial)**
+**NOTEBOOK JUPYTER**
+
+**Configuração e Conexão (Código Essencial)**
 
 Como a aplicação se conecta à infraestrutura Docker e configura o ambiente para lidar com arquivos grandes:
 ```
@@ -155,6 +157,60 @@ print(f"\n✅ Concluído: {total_inserted} documentos na coleção '{collection_
         print(f"\n❌ Erro ao processar {collection_name}: {e}")
     finally:
         client.close()
+```
+orchestrator Lógica da Função run_etl()
+
+A função run_etl() coordena o fluxo de dados desde a origem (Kaggle) até o destino (MongoDB), garantindo que os dados sejam baixados, processados e verificados.
+
+**Extração e Verificação**
+
+Esta é a fase inicial, responsável por obter os dados brutos da fonte externa (Kaggle).
+
+```
+print("⬇ 1. Baixando dados do Kaggle (Isso pode levar alguns minutos)...")
+try:
+    path = kagglehub.dataset_download("antonkozyriev/game-recommendations-on-steam") 
+    print(f"📂 Dados baixados em: {path}")
+except Exception as e:
+    # ... tratamento de erro
+    return
+```
+**Carga Otimizada**
+
+Esta fase é a iteração principal, onde a Carga de dados (utilizando a lógica de chunking da função ingest_file_to_mongo) é disparada para cada arquivo CSV.
+```
+files_map = { 
+    'games.csv': 'games',
+    'users.csv': 'users',
+    'recommendations.csv': 'recommendations'
+}
+print("\n🚀 2. Enviando para o MongoDB...")
+
+for csv_file, col_name in files_map.items():
+    full_path = os.path.join(path, csv_file)
+    if os.path.exists(full_path):
+        ingest_file_to_mongo(full_path, col_name)
+    else:
+        print(f"⚠ Arquivo {csv_file} não encontrado.")
+```
+**Validação Final**
+
+Esta etapa garante a qualidade e a completude do processo ELT.
+```
+print("\n📊 3. Verificação Final do Banco de Dados:")
+client = MongoClient(MONGO_URI)
+db = client[DB_NAME]
+for col in db.list_collection_names():
+    count = db[col].count_documents({})
+    print(f"   📁 {col}: {count:,} documentos")
+client.close()
+```
+**Comando de Execução do Pipeline**
+
+A linha final do script é a chamada da função run_etl(), que é o ponto de entrada principal para iniciar todo o processo de Extração, Carga e Validação.
+```
+run_etl()
+
 ```
  **2. MONGODB (Banco NoSQL)**
  ```
