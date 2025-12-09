@@ -58,6 +58,104 @@ Função: Execução do seu pipeline de ingestão e processamento.
 
 Conexão: Ele se conecta ao MongoDB usando o nome do serviço mongo (conforme definido no arquivo do MongoDB) através da rede mybridge.
 
+**1. Configuração e Conexão (Código Essencial)**
+
+Como a aplicação se conecta à infraestrutura Docker e configura o ambiente para lidar com arquivos grandes:
+```
+1. IMPORTAÇÕES E CONFIGURAÇÃO (Executar Primeiro)
+import os
+import pandas as pd
+import kagglehub
+from pymongo import MongoClient
+```
+
+**Configuração Crítica de Disco (Volume Mapping)**
+
+O bloco de código aborda um problema comum ao lidar com datasets grandes em ambientes conteinerizados: a falta de espaço.
+```
+# 📂 CONFIGURAÇÃO CRÍTICA DE DISCO
+# Aponta o cache de download para a pasta mapeada no Docker (seu HD físico).
+# Isso evita o erro "No space left on device" da VM.
+CACHE_DIR = '/home/jovyan/datasets/kaggle_cache'
+os.environ['KAGGLEHUB_CACHE'] = CACHE_DIR
+```
+**Configuração do MongoDB (Conexão de Serviço)**
+
+Este bloco define como o seu script (rodando no contêiner Jupyter) encontra e se autentica no serviço de banco de dados (rodando no contêiner MongoDB).
+```
+# 🔌 CONFIGURAÇÃO DO MONGODB
+# Usa o nome do serviço 'mongo_service' definido no docker-compose
+MONGO_URI = "mongodb://root:mongo@mongo_service:27017/?authSource=admin"
+DB_NAME = "SteamRecommendations"
+
+print(f"⚙ Configuração:")
+print(f"   -> Cache Temporário: {CACHE_DIR}")
+print(f"   -> Destino MongoDB: {MONGO_URI.split('@')[1]}") # Mostra apenas o host para confirmar
+```
+**2. Função de Ingestão Otimizada (Chunking)**
+
+A função abaixo é a chave para a eficiência, pois lê os arquivos CSV em pedaços de 10.000 linhas (chunk_size), prevenindo a sobrecarga da memória do contêiner Jupyter:
+
+2. FUNÇÃO DE INGESTÃO (CARGA EM LOTES)
+```
+def ingest_file_to_mongo(file_path, collection_name):
+    """Lê CSV em pedaços e envia para o Mongo para economizar RAM."""
+    # ... inicializa cliente
+    chunk_size = 10000 # Processa 10 mil linhas por vez
+    
+    try:
+        # Lê o arquivo CSV em pedaços
+        with pd.read_csv(file_path, chunksize=chunk_size, low_memory=False) as reader:
+            for chunk in reader:
+                data = chunk.to_dict('records')
+                if data:
+                    collection.insert_many(data)
+                    # ... contagem e feedback
+    # ... tratamento de erros
+```
+**Inicialização e Limpeza (Pré-Carga)**
+```
+client = MongoClient(MONGO_URI)
+db = client[DB_NAME]
+collection = db[collection_name]
+
+# Limpa dados antigos para evitar duplicação se rodar 2x
+collection.drop()
+print(f"\n🔄 Processando '{collection_name}'...")
+```
+**Otimização de Memória (Chunking)**
+
+Esta é a parte mais importante para um projeto de Big Data, pois resolve o problema de RAM limitada.
+```
+chunk_size = 10000 # Processa 10 mil linhas por vez
+# ...
+with pd.read_csv(file_path, chunksize=chunk_size, low_memory=False) as reader:
+    for chunk in reader:
+        # ... processamento do chunk
+```
+**Transformação e Carga (ETL)**
+
+Dentro do loop de iteração (o coração da função), o código transforma o pedaço lido em um formato compatível com o MongoDB e o insere.
+```
+for chunk in reader:
+                # Converte para formato JSON (lista de dicionários)
+                data = chunk.to_dict('records')
+                if data:
+                    collection.insert_many(data)
+                    total_inserted += len(data)
+                    print(f"   -> Inseridos: {total_inserted} registros...", end='\r')
+```
+**Conclusão e Robustez do Pipeline**
+
+Este bloco finaliza o processamento de cada coleção, garantindo que o pipeline seja robusto (tratamento de falhas) e limpo (liberação de recursos).
+```
+print(f"\n✅ Concluído: {total_inserted} documentos na coleção '{collection_name}'.")
+        
+    except Exception as e:
+        print(f"\n❌ Erro ao processar {collection_name}: {e}")
+    finally:
+        client.close()
+```
  **2. MONGODB (Banco NoSQL)**
  ```
 version: '3.3'
